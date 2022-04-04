@@ -1,7 +1,7 @@
 name: flutter_virtual_piano
-description: A new Flutter project.
+description: A virtual piano for Flutter.
 version: 0.0.1
-homepage:
+homepage: https://www.invisiblewrench.com
 
 environment:
   sdk: ">=2.16.1 <3.0.0"

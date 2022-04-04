@@ -36,7 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: SizedBox(
         height: 80,
         child: VirtualPiano(
-          noteRange: RangeValues(21, 108),
+          noteRange: const RangeValues(21, 108),
           highlightedNoteSets: const [
             HighlightedNoteSet({44, 55, 77, 32}, Colors.green),
             HighlightedNoteSet({34, 45, 67, 32}, Colors.blue)
