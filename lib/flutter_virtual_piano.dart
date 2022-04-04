@@ -22,6 +22,12 @@ class VirtualPiano extends StatefulWidget {
   /// Parameters are the note of the key (int) and the vertical position of the drag on the key (double)
   final Function(int, double)? onNotePressSlide;
 
+  /// The color to render white keys.
+  final Color whiteKeyColor;
+
+  /// The color to render black keys.
+  final Color blackKeyColor;
+
   const VirtualPiano({
     Key? key,
     required this.noteRange,
@@ -29,6 +35,8 @@ class VirtualPiano extends StatefulWidget {
     this.onNotePressed,
     this.onNotePressSlide,
     this.onNoteReleased,
+    this.whiteKeyColor = Colors.white,
+    this.blackKeyColor = Colors.black,
   }) : super(key: key);
 
   @override
@@ -211,16 +219,12 @@ class _VirtualPianoState extends State<VirtualPiano> {
 
       assert(minValue < maxValue);
 
-      var firstWhiteKey =
-          _whites.indexOf(_whites.firstWhere((value) => value > minValue)) - 1;
-      var lastWhiteKey =
-          _whites.lastIndexWhere((value) => value < maxValue) + 2;
+      var firstWhiteKey = _whites.indexOf(_whites.firstWhere((value) => value > minValue)) - 1;
+      var lastWhiteKey = _whites.lastIndexWhere((value) => value < maxValue) + 2;
       var whiteKeyCount = lastWhiteKey - firstWhiteKey;
 
-      var firstBlackKey =
-          _blacks.indexOf(_blacks.firstWhere((value) => value > minValue));
-      var lastBlackKey =
-          _blacks.lastIndexWhere((value) => value != 0 && value < maxValue) + 1;
+      var firstBlackKey = _blacks.indexOf(_blacks.firstWhere((value) => value > minValue));
+      var lastBlackKey = _blacks.lastIndexWhere((value) => value != 0 && value < maxValue) + 1;
       var blackKeyCount = lastBlackKey - firstBlackKey;
 
       var keyWidth = constraints.maxWidth / whiteKeyCount;
@@ -237,7 +241,7 @@ class _VirtualPianoState extends State<VirtualPiano> {
                 note: note,
                 width: keyWidth,
                 height: keyHeight,
-                color: _colorForNote(note) ?? Colors.white,
+                color: Color.lerp(widget.whiteKeyColor, _colorForNote(note) ?? widget.whiteKeyColor, 0.5),
                 onNotePressed: widget.onNotePressed,
                 onNoteReleased: widget.onNoteReleased,
                 onNotePressSlide: widget.onNotePressSlide,
@@ -259,7 +263,7 @@ class _VirtualPianoState extends State<VirtualPiano> {
                           note: note,
                           width: width,
                           height: keyHeight * 0.6,
-                          color: _colorForNote(note) ?? Colors.black,
+                          color: Color.lerp(widget.blackKeyColor, _colorForNote(note) ?? widget.blackKeyColor, 0.5),
                           onNotePressed: widget.onNotePressed,
                           onNoteReleased: widget.onNoteReleased,
                           onNotePressSlide: widget.onNotePressSlide,
@@ -302,9 +306,7 @@ class _PianoKey extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var borderRadius = BorderRadius.only(
-        bottomLeft: Radius.circular(width / 6),
-        bottomRight: Radius.circular(width / 6));
+    var borderRadius = BorderRadius.only(bottomLeft: Radius.circular(width / 6), bottomRight: Radius.circular(width / 6));
 
     return Material(
       elevation: 2,
@@ -327,44 +329,31 @@ class _PianoKey extends StatelessWidget {
                   ))
               : null,
         ),
-        onTapDown: (details) {
-          if (onNotePressed != null) {
-            onNotePressed!(note, details.localPosition.dy / height);
-          }
-        },
-        onTapUp: (details) {
-          if (onNoteReleased != null) {
-            onNoteReleased!();
-          }
-        },
-        onTapCancel: () {
-          if (onNoteReleased != null) {
-            onNoteReleased!();
-          }
-        },
-        onVerticalDragUpdate: (details) {
-          if (onNotePressSlide != null) {
-            onNotePressSlide!(note, details.localPosition.dy / height);
-          }
-        },
+        onTapDown: onNotePressed != null
+            ? (details) {
+                onNotePressed!(note, details.localPosition.dy / height);
+              }
+            : null,
+        onTapUp: onNoteReleased != null
+            ? (details) {
+                onNoteReleased!();
+              }
+            : null,
+        onTapCancel: onNoteReleased != null
+            ? () {
+                onNoteReleased!();
+              }
+            : null,
+        onVerticalDragUpdate: onNotePressSlide != null
+            ? (details) {
+                onNotePressSlide!(note, details.localPosition.dy / height);
+              }
+            : null,
       ),
     );
   }
 
-  static const noteNames = [
-    "C",
-    "C#",
-    "D",
-    "D#",
-    "E",
-    "F",
-    "F#",
-    "G",
-    "G#",
-    "A",
-    "A#",
-    "B"
-  ];
+  static const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
   static String _midiToNoteValue(int midiValue) {
     var noteIndex = midiValue % 12;
     var octave = _midiOctave(midiValue);

@@ -1,6 +1,11 @@
+## 0.0.3
+
+* Fixed key highlight coloring
+* Added key color overrides
+
 ## 0.0.2
 
-Formatting and documentation.
+* Formatting and documentation.
 
 ## 0.0.1
 
