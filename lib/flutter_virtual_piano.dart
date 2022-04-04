@@ -3,10 +3,23 @@ library flutter_virtual_piano;
 import 'package:flutter/material.dart';
 
 class VirtualPiano extends StatefulWidget {
+  /// The range of notes to render on the Piano.
+  /// Note ranges are defined by their MIDI note values, so a value of 0 equals C-1 and a value of 127 equals G9.
+  /// Values outside of this 0..127 range are invalid.
   final RangeValues noteRange;
+
+  /// A list of sets of notes to be highlighted (colored).
   final List<HighlightedNoteSet>? highlightedNoteSets;
+
+  /// Called when a key is pressed/touched.
+  /// Parameters are the note of the key (int) and the vertical position of the touch on the key (double)
   final Function(int, double)? onNotePressed;
+
+  /// Called when a key is released.
   final Function()? onNoteReleased;
+
+  /// Called when a vertical drag/slide is performed on a key.
+  /// Parameters are the note of the key (int) and the vertical position of the drag on the key (double)
   final Function(int, double)? onNotePressSlide;
 
   const VirtualPiano({
@@ -193,12 +206,21 @@ class _VirtualPianoState extends State<VirtualPiano> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-      var firstWhiteKey = _whites.indexOf(_whites.firstWhere((value) => value > widget.noteRange.start)) - 1;
-      var lastWhiteKey = _whites.lastIndexWhere((value) => value < widget.noteRange.end) + 2;
+      var minValue = widget.noteRange.start.clamp(0, 127);
+      var maxValue = widget.noteRange.end.clamp(0, 127);
+
+      assert(minValue < maxValue);
+
+      var firstWhiteKey =
+          _whites.indexOf(_whites.firstWhere((value) => value > minValue)) - 1;
+      var lastWhiteKey =
+          _whites.lastIndexWhere((value) => value < maxValue) + 2;
       var whiteKeyCount = lastWhiteKey - firstWhiteKey;
 
-      var firstBlackKey = _blacks.indexOf(_blacks.firstWhere((value) => value > widget.noteRange.start));
-      var lastBlackKey = _blacks.lastIndexWhere((value) => value != 0 && value < widget.noteRange.end) + 1;
+      var firstBlackKey =
+          _blacks.indexOf(_blacks.firstWhere((value) => value > minValue));
+      var lastBlackKey =
+          _blacks.lastIndexWhere((value) => value != 0 && value < maxValue) + 1;
       var blackKeyCount = lastBlackKey - firstBlackKey;
 
       var keyWidth = constraints.maxWidth / whiteKeyCount;
@@ -211,7 +233,7 @@ class _VirtualPianoState extends State<VirtualPiano> {
             // white
             children: List.generate(whiteKeyCount, (index) {
               var note = _whites[firstWhiteKey + index];
-              return PianoKey(
+              return _PianoKey(
                 note: note,
                 width: keyWidth,
                 height: keyHeight,
@@ -233,7 +255,7 @@ class _VirtualPianoState extends State<VirtualPiano> {
                   width: width,
                   padding: EdgeInsets.symmetric(horizontal: keyWidth / 6.0),
                   child: note != 0
-                      ? PianoKey(
+                      ? _PianoKey(
                           note: note,
                           width: width,
                           height: keyHeight * 0.6,
@@ -242,7 +264,7 @@ class _VirtualPianoState extends State<VirtualPiano> {
                           onNoteReleased: widget.onNoteReleased,
                           onNotePressSlide: widget.onNotePressSlide,
                         )
-                      : Container(
+                      : SizedBox(
                           width: width,
                         ),
                 );
@@ -255,7 +277,7 @@ class _VirtualPianoState extends State<VirtualPiano> {
   }
 }
 
-class PianoKey extends StatelessWidget {
+class _PianoKey extends StatelessWidget {
   final bool showKeyLabel;
   final int note;
   final Color? color;
@@ -266,7 +288,7 @@ class PianoKey extends StatelessWidget {
   final Function()? onNoteReleased;
   final Function(int, double)? onNotePressSlide;
 
-  const PianoKey(
+  const _PianoKey(
       {this.showKeyLabel = false,
       required this.note,
       this.color,
@@ -280,7 +302,9 @@ class PianoKey extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var borderRadius = BorderRadius.only(bottomLeft: Radius.circular(width / 6), bottomRight: Radius.circular(width / 6));
+    var borderRadius = BorderRadius.only(
+        bottomLeft: Radius.circular(width / 6),
+        bottomRight: Radius.circular(width / 6));
 
     return Material(
       elevation: 2,
@@ -327,7 +351,20 @@ class PianoKey extends StatelessWidget {
     );
   }
 
-  static const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+  static const noteNames = [
+    "C",
+    "C#",
+    "D",
+    "D#",
+    "E",
+    "F",
+    "F#",
+    "G",
+    "G#",
+    "A",
+    "A#",
+    "B"
+  ];
   static String _midiToNoteValue(int midiValue) {
     var noteIndex = midiValue % 12;
     var octave = _midiOctave(midiValue);
@@ -344,6 +381,7 @@ class PianoKey extends StatelessWidget {
   }
 }
 
+/// A data structure for defining notes to be highlighted and the color the keys should have.
 class HighlightedNoteSet {
   final Color highlightColor;
   final Set<int> noteValues;
