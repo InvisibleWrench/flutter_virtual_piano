@@ -28,6 +28,12 @@ class VirtualPiano extends StatefulWidget {
   /// The color to render black keys.
   final Color blackKeyColor;
 
+  /// The (material) elevation of the piano keys
+  final double elevation;
+
+  /// The width of the border around each key
+  final double borderWidth;
+
   const VirtualPiano({
     Key? key,
     required this.noteRange,
@@ -37,6 +43,8 @@ class VirtualPiano extends StatefulWidget {
     this.onNoteReleased,
     this.whiteKeyColor = Colors.white,
     this.blackKeyColor = Colors.black,
+    this.elevation = 2,
+    this.borderWidth = 0.5,
   }) : super(key: key);
 
   @override
@@ -219,12 +227,16 @@ class _VirtualPianoState extends State<VirtualPiano> {
 
       assert(minValue < maxValue);
 
-      var firstWhiteKey = _whites.indexOf(_whites.firstWhere((value) => value > minValue)) - 1;
-      var lastWhiteKey = _whites.lastIndexWhere((value) => value < maxValue) + 2;
+      var firstWhiteKey =
+          _whites.indexOf(_whites.firstWhere((value) => value > minValue)) - 1;
+      var lastWhiteKey =
+          _whites.lastIndexWhere((value) => value < maxValue) + 2;
       var whiteKeyCount = lastWhiteKey - firstWhiteKey;
 
-      var firstBlackKey = _blacks.indexOf(_blacks.firstWhere((value) => value > minValue));
-      var lastBlackKey = _blacks.lastIndexWhere((value) => value != 0 && value < maxValue) + 1;
+      var firstBlackKey =
+          _blacks.indexOf(_blacks.firstWhere((value) => value > minValue));
+      var lastBlackKey =
+          _blacks.lastIndexWhere((value) => value != 0 && value < maxValue) + 1;
       var blackKeyCount = lastBlackKey - firstBlackKey;
 
       var keyWidth = constraints.maxWidth / whiteKeyCount;
@@ -241,10 +253,12 @@ class _VirtualPianoState extends State<VirtualPiano> {
                 note: note,
                 width: keyWidth,
                 height: keyHeight,
-                color: Color.lerp(widget.whiteKeyColor, _colorForNote(note) ?? widget.whiteKeyColor, 0.5),
+                color: Color.lerp(widget.whiteKeyColor,
+                    _colorForNote(note) ?? widget.whiteKeyColor, 0.5),
                 onNotePressed: widget.onNotePressed,
                 onNoteReleased: widget.onNoteReleased,
                 onNotePressSlide: widget.onNotePressSlide,
+                elevation: widget.elevation,
               );
             }),
           ),
@@ -263,7 +277,8 @@ class _VirtualPianoState extends State<VirtualPiano> {
                           note: note,
                           width: width,
                           height: keyHeight * 0.6,
-                          color: Color.lerp(widget.blackKeyColor, _colorForNote(note) ?? widget.blackKeyColor, 0.5),
+                          color: Color.lerp(widget.blackKeyColor,
+                              _colorForNote(note) ?? widget.blackKeyColor, 0.5),
                           onNotePressed: widget.onNotePressed,
                           onNoteReleased: widget.onNoteReleased,
                           onNotePressSlide: widget.onNotePressSlide,
@@ -285,31 +300,39 @@ class _PianoKey extends StatelessWidget {
   final bool showKeyLabel;
   final int note;
   final Color? color;
+  final Color? borderColor;
   final double width;
   final double height;
+  final double elevation;
+  final double borderWidth;
 
   final Function(int, double)? onNotePressed;
   final Function()? onNoteReleased;
   final Function(int, double)? onNotePressSlide;
 
-  const _PianoKey(
-      {this.showKeyLabel = false,
-      required this.note,
-      this.color,
-      required this.width,
-      required this.height,
-      Key? key,
-      this.onNoteReleased,
-      this.onNotePressed,
-      this.onNotePressSlide})
-      : super(key: key);
+  const _PianoKey({
+    this.showKeyLabel = false,
+    required this.note,
+    this.color,
+    this.borderColor,
+    required this.width,
+    required this.height,
+    Key? key,
+    this.onNoteReleased,
+    this.onNotePressed,
+    this.onNotePressSlide,
+    this.elevation = 2.0,
+    this.borderWidth = 0.5,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var borderRadius = BorderRadius.only(bottomLeft: Radius.circular(width / 6), bottomRight: Radius.circular(width / 6));
+    var borderRadius = BorderRadius.only(
+        bottomLeft: Radius.circular(width / 6),
+        bottomRight: Radius.circular(width / 6));
 
     return Material(
-      elevation: 2,
+      elevation: elevation,
       borderRadius: borderRadius,
       child: GestureDetector(
         child: Container(
@@ -317,7 +340,8 @@ class _PianoKey extends StatelessWidget {
           height: height,
           decoration: BoxDecoration(
             color: color,
-            border: Border.all(color: Colors.grey.shade700),
+            border: Border.all(
+                color: borderColor ?? Colors.grey.shade700, width: borderWidth),
             borderRadius: borderRadius,
           ),
           child: showKeyLabel
@@ -353,7 +377,20 @@ class _PianoKey extends StatelessWidget {
     );
   }
 
-  static const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+  static const noteNames = [
+    "C",
+    "C#",
+    "D",
+    "D#",
+    "E",
+    "F",
+    "F#",
+    "G",
+    "G#",
+    "A",
+    "A#",
+    "B"
+  ];
   static String _midiToNoteValue(int midiValue) {
     var noteIndex = midiValue % 12;
     var octave = _midiOctave(midiValue);

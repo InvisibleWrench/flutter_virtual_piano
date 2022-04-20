@@ -1,3 +1,8 @@
+## 0.0.4
+
+* Added material elevation control
+* Added key border width parameter
+
 ## 0.0.3
 
 * Fixed key highlight coloring

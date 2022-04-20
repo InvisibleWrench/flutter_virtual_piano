@@ -47,6 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
           onNotePressSlide: (note, pos) {
             print("note slide $note pressed at $pos");
           },
+          elevation: 0,
         ),
       ),
     );
