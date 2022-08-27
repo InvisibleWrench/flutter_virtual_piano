@@ -1,3 +1,7 @@
+## 0.0.5
+
+* Added keyHighlightColorBlend control
+
 ## 0.0.4
 
 * Added material elevation control

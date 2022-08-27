@@ -34,6 +34,9 @@ class VirtualPiano extends StatefulWidget {
   /// The width of the border around each key
   final double borderWidth;
 
+  /// The blend between keys highlight color and base color
+  final double keyHighlightColorBlend;
+
   const VirtualPiano({
     Key? key,
     required this.noteRange,
@@ -45,6 +48,7 @@ class VirtualPiano extends StatefulWidget {
     this.blackKeyColor = Colors.black,
     this.elevation = 2,
     this.borderWidth = 0.5,
+    this.keyHighlightColorBlend = 0.8,
   }) : super(key: key);
 
   @override
@@ -227,16 +231,12 @@ class _VirtualPianoState extends State<VirtualPiano> {
 
       assert(minValue < maxValue);
 
-      var firstWhiteKey =
-          _whites.indexOf(_whites.firstWhere((value) => value > minValue)) - 1;
-      var lastWhiteKey =
-          _whites.lastIndexWhere((value) => value < maxValue) + 2;
+      var firstWhiteKey = _whites.indexOf(_whites.firstWhere((value) => value > minValue)) - 1;
+      var lastWhiteKey = _whites.lastIndexWhere((value) => value < maxValue) + 2;
       var whiteKeyCount = lastWhiteKey - firstWhiteKey;
 
-      var firstBlackKey =
-          _blacks.indexOf(_blacks.firstWhere((value) => value > minValue));
-      var lastBlackKey =
-          _blacks.lastIndexWhere((value) => value != 0 && value < maxValue) + 1;
+      var firstBlackKey = _blacks.indexOf(_blacks.firstWhere((value) => value > minValue));
+      var lastBlackKey = _blacks.lastIndexWhere((value) => value != 0 && value < maxValue) + 1;
       var blackKeyCount = lastBlackKey - firstBlackKey;
 
       var keyWidth = constraints.maxWidth / whiteKeyCount;
@@ -253,8 +253,7 @@ class _VirtualPianoState extends State<VirtualPiano> {
                 note: note,
                 width: keyWidth,
                 height: keyHeight,
-                color: Color.lerp(widget.whiteKeyColor,
-                    _colorForNote(note) ?? widget.whiteKeyColor, 0.5),
+                color: Color.lerp(widget.whiteKeyColor, _colorForNote(note) ?? widget.whiteKeyColor, widget.keyHighlightColorBlend),
                 onNotePressed: widget.onNotePressed,
                 onNoteReleased: widget.onNoteReleased,
                 onNotePressSlide: widget.onNotePressSlide,
@@ -277,8 +276,7 @@ class _VirtualPianoState extends State<VirtualPiano> {
                           note: note,
                           width: width,
                           height: keyHeight * 0.6,
-                          color: Color.lerp(widget.blackKeyColor,
-                              _colorForNote(note) ?? widget.blackKeyColor, 0.5),
+                          color: Color.lerp(widget.blackKeyColor, _colorForNote(note) ?? widget.blackKeyColor, widget.keyHighlightColorBlend),
                           onNotePressed: widget.onNotePressed,
                           onNoteReleased: widget.onNoteReleased,
                           onNotePressSlide: widget.onNotePressSlide,
@@ -327,9 +325,7 @@ class _PianoKey extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var borderRadius = BorderRadius.only(
-        bottomLeft: Radius.circular(width / 6),
-        bottomRight: Radius.circular(width / 6));
+    var borderRadius = BorderRadius.only(bottomLeft: Radius.circular(width / 6), bottomRight: Radius.circular(width / 6));
 
     return Material(
       elevation: elevation,
@@ -340,8 +336,7 @@ class _PianoKey extends StatelessWidget {
           height: height,
           decoration: BoxDecoration(
             color: color,
-            border: Border.all(
-                color: borderColor ?? Colors.grey.shade700, width: borderWidth),
+            border: Border.all(color: borderColor ?? Colors.grey.shade700, width: borderWidth),
             borderRadius: borderRadius,
           ),
           child: showKeyLabel
@@ -377,20 +372,7 @@ class _PianoKey extends StatelessWidget {
     );
   }
 
-  static const noteNames = [
-    "C",
-    "C#",
-    "D",
-    "D#",
-    "E",
-    "F",
-    "F#",
-    "G",
-    "G#",
-    "A",
-    "A#",
-    "B"
-  ];
+  static const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
   static String _midiToNoteValue(int midiValue) {
     var noteIndex = midiValue % 12;
     var octave = _midiOctave(midiValue);
