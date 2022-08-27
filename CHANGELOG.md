@@ -1,3 +1,7 @@
+## 0.0.6
+
+* add note number to onRelease. Thanks to https://github.com/maks
+
 ## 0.0.5
 
 * Added keyHighlightColorBlend control

@@ -16,7 +16,7 @@ class VirtualPiano extends StatefulWidget {
   final Function(int, double)? onNotePressed;
 
   /// Called when a key is released.
-  final Function()? onNoteReleased;
+  final Function(int)? onNoteReleased;
 
   /// Called when a vertical drag/slide is performed on a key.
   /// Parameters are the note of the key (int) and the vertical position of the drag on the key (double)
