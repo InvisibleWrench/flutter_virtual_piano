@@ -44,6 +44,9 @@ class _MyHomePageState extends State<MyHomePage> {
           onNotePressed: (note, pos) {
             print("note pressed $note pressed at $pos");
           },
+          onNoteReleased: (note) {
+            print("note released $note");
+          },
           onNotePressSlide: (note, pos) {
             print("note slide $note pressed at $pos");
           },

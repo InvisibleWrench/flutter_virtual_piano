@@ -305,7 +305,7 @@ class _PianoKey extends StatelessWidget {
   final double borderWidth;
 
   final Function(int, double)? onNotePressed;
-  final Function()? onNoteReleased;
+  final Function(int)? onNoteReleased;
   final Function(int, double)? onNotePressSlide;
 
   const _PianoKey({
@@ -348,26 +348,26 @@ class _PianoKey extends StatelessWidget {
                   ))
               : null,
         ),
-        onTapDown: onNotePressed != null
-            ? (details) {
-                onNotePressed!(note, details.localPosition.dy / height);
-              }
-            : null,
-        onTapUp: onNoteReleased != null
-            ? (details) {
-                onNoteReleased!();
-              }
-            : null,
-        onTapCancel: onNoteReleased != null
-            ? () {
-                onNoteReleased!();
-              }
-            : null,
-        onVerticalDragUpdate: onNotePressSlide != null
-            ? (details) {
-                onNotePressSlide!(note, details.localPosition.dy / height);
-              }
-            : null,
+        onTapDown: (details) {
+          if (onNotePressed != null) {
+            onNotePressed!(note, details.localPosition.dy / height);
+          }
+        },
+        onTapUp: (details) {
+          if (onNoteReleased != null) {
+            onNoteReleased!(note);
+          }
+        },
+        onTapCancel: () {
+          if (onNoteReleased != null) {
+            onNoteReleased!(note);
+          }
+        },
+        onVerticalDragUpdate: (details) {
+          if (onNotePressSlide != null) {
+            onNotePressSlide!(note, details.localPosition.dy / height);
+          }
+        },
       ),
     );
   }
