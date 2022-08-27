@@ -16,7 +16,7 @@ class VirtualPiano extends StatefulWidget {
   final Function(int, double)? onNotePressed;
 
   /// Called when a key is released.
-  final Function()? onNoteReleased;
+  final Function(int)? onNoteReleased;
 
   /// Called when a vertical drag/slide is performed on a key.
   /// Parameters are the note of the key (int) and the vertical position of the drag on the key (double)
@@ -285,7 +285,7 @@ class _PianoKey extends StatelessWidget {
   final double height;
 
   final Function(int, double)? onNotePressed;
-  final Function()? onNoteReleased;
+  final Function(int)? onNoteReleased;
   final Function(int, double)? onNotePressSlide;
 
   const _PianoKey(
@@ -334,12 +334,12 @@ class _PianoKey extends StatelessWidget {
         },
         onTapUp: (details) {
           if (onNoteReleased != null) {
-            onNoteReleased!();
+            onNoteReleased!(note);
           }
         },
         onTapCancel: () {
           if (onNoteReleased != null) {
-            onNoteReleased!();
+            onNoteReleased!(note);
           }
         },
         onVerticalDragUpdate: (details) {
