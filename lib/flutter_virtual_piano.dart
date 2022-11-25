@@ -349,26 +349,26 @@ class _PianoKey extends StatelessWidget {
                   ))
               : null,
         ),
-        onTapDown: (details) {
-          if (onNotePressed != null) {
-            onNotePressed!(note, details.localPosition.dy / height);
-          }
-        },
-        onTapUp: (details) {
-          if (onNoteReleased != null) {
-            onNoteReleased!(note);
-          }
-        },
-        onTapCancel: () {
-          if (onNoteReleased != null) {
-            onNoteReleased!(note);
-          }
-        },
-        onVerticalDragUpdate: (details) {
-          if (onNotePressSlide != null) {
-            onNotePressSlide!(note, details.localPosition.dy / height);
-          }
-        },
+        onTapDown: onNotePressed != null
+            ? (details) {
+                onNotePressed!(note, details.localPosition.dy / height);
+              }
+            : null,
+        onTapUp: onNoteReleased != null
+            ? (details) {
+                onNoteReleased!(note);
+              }
+            : null,
+        onTapCancel: onNoteReleased != null
+            ? () {
+                onNoteReleased!(note);
+              }
+            : null,
+        onVerticalDragUpdate: onNotePressSlide != null
+            ? (details) {
+                onNotePressSlide!(note, details.localPosition.dy / height);
+              }
+            : null,
       ),
     );
   }

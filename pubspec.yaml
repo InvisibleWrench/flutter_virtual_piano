@@ -1,6 +1,6 @@
 name: flutter_virtual_piano
 description: A package for rendering an interactive virtual piano with Flutter.
-version: 0.0.7
+version: 0.0.8
 homepage: https://www.invisiblewrench.com
 
 environment:

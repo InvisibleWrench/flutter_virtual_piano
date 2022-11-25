@@ -1,3 +1,7 @@
+## 0.0.8
+
+* Fixed disabling of GestureRecognizer when callbacks are null
+
 ## 0.0.7
 
 * fixed key range logic. Sometimes black keys where missing.
