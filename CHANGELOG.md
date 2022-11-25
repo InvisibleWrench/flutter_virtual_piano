@@ -1,3 +1,7 @@
+## 0.0.7
+
+* fixed key range logic. Sometimes black keys where missing.
+
 ## 0.0.6
 
 * add note number to onRelease. Thanks to https://github.com/maks

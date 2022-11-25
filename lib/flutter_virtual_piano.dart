@@ -1,5 +1,7 @@
 library flutter_virtual_piano;
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class VirtualPiano extends StatefulWidget {
@@ -230,14 +232,13 @@ class _VirtualPianoState extends State<VirtualPiano> {
       var maxValue = widget.noteRange.end.clamp(0, 127);
 
       assert(minValue < maxValue);
+      var firstBlackKey = _blacks.indexOf(_blacks.firstWhere((value) => value > minValue));
+      var lastBlackKey = _blacks.lastIndexWhere((value) => value != 0 && value <= maxValue);
+      var blackKeyCount = lastBlackKey - firstBlackKey + 1;
 
       var firstWhiteKey = _whites.indexOf(_whites.firstWhere((value) => value > minValue)) - 1;
-      var lastWhiteKey = _whites.lastIndexWhere((value) => value < maxValue) + 2;
-      var whiteKeyCount = lastWhiteKey - firstWhiteKey;
-
-      var firstBlackKey = _blacks.indexOf(_blacks.firstWhere((value) => value > minValue));
-      var lastBlackKey = _blacks.lastIndexWhere((value) => value != 0 && value < maxValue) + 1;
-      var blackKeyCount = lastBlackKey - firstBlackKey;
+      var lastWhiteKey = max(_whites.lastIndexWhere((value) => value <= maxValue), lastBlackKey + 1);
+      var whiteKeyCount = lastWhiteKey - firstWhiteKey + 1;
 
       var keyWidth = constraints.maxWidth / whiteKeyCount;
       var keyHeight = constraints.maxHeight;
