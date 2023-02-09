@@ -38,7 +38,8 @@ class _MyHomePageState extends State<MyHomePage> {
         child: SizedBox(
           height: 80,
           child: VirtualPiano(
-            noteRange: const RangeValues(60, 72),
+            noteRange: const RangeValues(61, 78),
+            // noteRange: const RangeValues(60, 90),
             highlightedNoteSets: const [
               // HighlightedNoteSet({44, 55, 77, 32}, Colors.green),
               // HighlightedNoteSet({34, 45, 67, 32}, Colors.blue)
@@ -53,6 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
               print("note slide $note pressed at $pos");
             },
             elevation: 0,
+            showKeyLabels: true,
           ),
         ),
       ),

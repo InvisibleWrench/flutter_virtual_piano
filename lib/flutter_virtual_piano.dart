@@ -39,6 +39,9 @@ class VirtualPiano extends StatefulWidget {
   /// The blend between keys highlight color and base color
   final double keyHighlightColorBlend;
 
+  /// Show key labels on the keys
+  final bool showKeyLabels;
+
   const VirtualPiano({
     Key? key,
     required this.noteRange,
@@ -51,6 +54,7 @@ class VirtualPiano extends StatefulWidget {
     this.elevation = 2,
     this.borderWidth = 0.5,
     this.keyHighlightColorBlend = 0.8,
+    this.showKeyLabels = false,
   }) : super(key: key);
 
   @override
@@ -232,7 +236,7 @@ class _VirtualPianoState extends State<VirtualPiano> {
       var maxValue = widget.noteRange.end.clamp(0, 127);
 
       assert(minValue < maxValue);
-      var firstBlackKey = _blacks.indexOf(_blacks.firstWhere((value) => value > minValue));
+      var firstBlackKey = _blacks.indexOf(_blacks.firstWhere((value) => value >= minValue));
       var lastBlackKey = _blacks.lastIndexWhere((value) => value != 0 && value <= maxValue);
       var blackKeyCount = lastBlackKey - firstBlackKey + 1;
 
@@ -259,6 +263,7 @@ class _VirtualPianoState extends State<VirtualPiano> {
                 onNoteReleased: widget.onNoteReleased,
                 onNotePressSlide: widget.onNotePressSlide,
                 elevation: widget.elevation,
+                showKeyLabel: widget.showKeyLabels,
               );
             }),
           ),
@@ -281,6 +286,7 @@ class _VirtualPianoState extends State<VirtualPiano> {
                           onNotePressed: widget.onNotePressed,
                           onNoteReleased: widget.onNoteReleased,
                           onNotePressSlide: widget.onNotePressSlide,
+                    showKeyLabel: widget.showKeyLabels,
                         )
                       : SizedBox(
                           width: width,
@@ -344,8 +350,9 @@ class _PianoKey extends StatelessWidget {
               ? Align(
                   alignment: Alignment.bottomCenter,
                   child: Text(
-                    _midiToNoteValue(note),
-                    style: TextStyle(color: Colors.grey.shade700),
+                    "${_midiToNoteValue(note)}\n$note",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey.shade500, fontSize: 8),
                   ))
               : null,
         ),

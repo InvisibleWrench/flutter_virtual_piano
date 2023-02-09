@@ -1,3 +1,6 @@
+## 0.0.9
+* Fixed indexing of black keys
+
 ## 0.0.8
 
 * Fixed disabling of GestureRecognizer when callbacks are null
