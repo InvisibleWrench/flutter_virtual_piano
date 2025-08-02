@@ -4,7 +4,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-class VirtualPiano extends StatefulWidget {
+class VirtualPiano extends StatelessWidget {
   /// The range of notes to render on the Piano.
   /// Note ranges are defined by their MIDI note values, so a value of 0 equals C-1 and a value of 127 equals G9.
   /// Values outside of this 0..127 range are invalid.
@@ -57,11 +57,6 @@ class VirtualPiano extends StatefulWidget {
     this.showKeyLabels = false,
   }) : super(key: key);
 
-  @override
-  State<VirtualPiano> createState() => _VirtualPianoState();
-}
-
-class _VirtualPianoState extends State<VirtualPiano> {
   //#region keys
   static const _whites = [
     0,
@@ -220,8 +215,8 @@ class _VirtualPianoState extends State<VirtualPiano> {
   //#endregion
 
   Color? _colorForNote(int note) {
-    for (int i = 0; i < (widget.highlightedNoteSets?.length ?? 0); i++) {
-      var set = widget.highlightedNoteSets![i];
+    for (int i = 0; i < (highlightedNoteSets?.length ?? 0); i++) {
+      var set = highlightedNoteSets![i];
       if (set.noteValues.contains(note)) {
         return set.highlightColor;
       }
@@ -232,8 +227,8 @@ class _VirtualPianoState extends State<VirtualPiano> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-      var minValue = widget.noteRange.start.clamp(0, 127);
-      var maxValue = widget.noteRange.end.clamp(0, 127);
+      var minValue = noteRange.start.clamp(0, 127);
+      var maxValue = noteRange.end.clamp(0, 127);
 
       assert(minValue < maxValue);
       var firstBlackKey = _blacks.indexOf(_blacks.firstWhere((value) => value >= minValue));
@@ -258,12 +253,13 @@ class _VirtualPianoState extends State<VirtualPiano> {
                 note: note,
                 width: keyWidth,
                 height: keyHeight,
-                color: Color.lerp(widget.whiteKeyColor, _colorForNote(note) ?? widget.whiteKeyColor, widget.keyHighlightColorBlend),
-                onNotePressed: widget.onNotePressed,
-                onNoteReleased: widget.onNoteReleased,
-                onNotePressSlide: widget.onNotePressSlide,
-                elevation: widget.elevation,
-                showKeyLabel: widget.showKeyLabels,
+                color: Color.lerp(whiteKeyColor, _colorForNote(note) ?? whiteKeyColor, keyHighlightColorBlend),
+                onNotePressed: onNotePressed,
+                onNoteReleased: onNoteReleased,
+                onNotePressSlide: onNotePressSlide,
+                elevation: elevation,
+                showKeyLabel: showKeyLabels,
+                borderWidth: borderWidth,
               );
             }),
           ),
@@ -282,11 +278,13 @@ class _VirtualPianoState extends State<VirtualPiano> {
                           note: note,
                           width: width,
                           height: keyHeight * 0.6,
-                          color: Color.lerp(widget.blackKeyColor, _colorForNote(note) ?? widget.blackKeyColor, widget.keyHighlightColorBlend),
-                          onNotePressed: widget.onNotePressed,
-                          onNoteReleased: widget.onNoteReleased,
-                          onNotePressSlide: widget.onNotePressSlide,
-                    showKeyLabel: widget.showKeyLabels,
+                          color: Color.lerp(blackKeyColor, _colorForNote(note) ?? blackKeyColor, keyHighlightColorBlend),
+                          onNotePressed: onNotePressed,
+                          onNoteReleased: onNoteReleased,
+                          onNotePressSlide: onNotePressSlide,
+                          elevation: elevation,
+                          showKeyLabel: showKeyLabels,
+                          borderWidth: borderWidth,
                         )
                       : SizedBox(
                           width: width,
@@ -305,7 +303,7 @@ class _PianoKey extends StatelessWidget {
   final bool showKeyLabel;
   final int note;
   final Color? color;
-  final Color? borderColor;
+  final Color borderColor;
   final double width;
   final double height;
   final double elevation;
@@ -319,7 +317,7 @@ class _PianoKey extends StatelessWidget {
     this.showKeyLabel = false,
     required this.note,
     this.color,
-    this.borderColor,
+    this.borderColor = Colors.grey,
     required this.width,
     required this.height,
     Key? key,
@@ -338,24 +336,6 @@ class _PianoKey extends StatelessWidget {
       elevation: elevation,
       borderRadius: borderRadius,
       child: GestureDetector(
-        child: Container(
-          width: width,
-          height: height,
-          decoration: BoxDecoration(
-            color: color,
-            border: Border.all(color: borderColor ?? Colors.grey.shade700, width: borderWidth),
-            borderRadius: borderRadius,
-          ),
-          child: showKeyLabel
-              ? Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Text(
-                    "${_midiToNoteValue(note)}\n$note",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey.shade500, fontSize: 8),
-                  ))
-              : null,
-        ),
         onTapDown: onNotePressed != null
             ? (details) {
                 onNotePressed!(note, details.localPosition.dy / height);
@@ -373,9 +353,27 @@ class _PianoKey extends StatelessWidget {
             : null,
         onVerticalDragUpdate: onNotePressSlide != null
             ? (details) {
-                onNotePressSlide!(note, details.localPosition.dy / height);
+                onNotePressSlide!(note, (details.localPosition.dy / height).clamp(0.0, 1.0));
               }
             : null,
+        child: Container(
+          width: width,
+          height: height,
+          decoration: BoxDecoration(
+            color: color,
+            border: Border.all(color: borderColor, width: borderWidth),
+            borderRadius: borderRadius,
+          ),
+          child: showKeyLabel
+              ? Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Text(
+                    "${_midiToNoteValue(note)}\n$note",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey.shade500, fontSize: 8),
+                  ))
+              : null,
+        ),
       ),
     );
   }

@@ -1,3 +1,6 @@
+## 0.0.10
+* Forwarded borderWidth to PianoKeys (Closes #3)
+
 ## 0.0.9
 * Fixed indexing of black keys
 
